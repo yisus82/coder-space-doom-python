@@ -3,7 +3,7 @@ from math import cos, sin, tau
 import pygame
 
 from settings import (PLAYER_ANGLE, PLAYER_POSITION, PLAYER_ROTATION_SPEED,
-                      PLAYER_SPEED, WINDOW_WIDTH)
+                      PLAYER_SPEED)
 
 
 class Player:
@@ -56,12 +56,6 @@ class Player:
             self.y += dy
 
     def draw(self):
-        pygame.draw.line(self.game.screen,
-                         'yellow',
-                         (self.x * 100, self.y * 100),
-                         (self.x * 100 + WINDOW_WIDTH * cos(self.angle),
-                             self.y * 100 + WINDOW_WIDTH * sin(self.angle)),
-                         2)
         pygame.draw.circle(self.game.screen, 'green',
                            (self.x * 100, self.y * 100), 15)
 
