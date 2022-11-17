@@ -36,8 +36,6 @@ class Game:
 
     def draw(self):
         self.screen.fill(BACKGROUND_COLOR)
-        self.map.draw()
-        self.player.draw()
 
     def run(self):
         while True:
