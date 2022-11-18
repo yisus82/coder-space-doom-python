@@ -3,14 +3,16 @@ import sys
 import pygame
 
 from map import Map
+from object_renderer import ObjectRenderer
 from player import Player
 from ray_casting import RayCasting
-from settings import BACKGROUND_COLOR, FPS, TITLE, WINDOW_HEIGHT, WINDOW_WIDTH
+from settings import FPS, TITLE, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.mouse.set_visible(False)
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
         self.delta_time = 1
@@ -19,6 +21,7 @@ class Game:
     def new_game(self):
         self.map = Map(self)
         self.player = Player(self)
+        self.object_renderer = ObjectRenderer(self)
         self.ray_casting = RayCasting(self)
 
     def check_events(self):
@@ -35,7 +38,7 @@ class Game:
         pygame.display.set_caption(f"{TITLE} - {self.clock.get_fps():.2f} FPS")
 
     def draw(self):
-        self.screen.fill(BACKGROUND_COLOR)
+        self.object_renderer.draw()
 
     def run(self):
         while True:

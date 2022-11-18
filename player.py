@@ -2,8 +2,10 @@ from math import cos, sin, tau
 
 import pygame
 
-from settings import (PLAYER_ANGLE, PLAYER_POSITION, PLAYER_ROTATION_SPEED,
-                      PLAYER_SPEED)
+from settings import (MOUSE_BORDER_LEFT, MOUSE_BORDER_RIGHT,
+                      MOUSE_MAX_RELATIVE_MOVEMENT, MOUSE_SENSITIVITY,
+                      PLAYER_ANGLE, PLAYER_POSITION, PLAYER_SIZE_SCALE,
+                      PLAYER_SPEED, WINDOW_HEIGHT, WINDOW_WIDTH)
 
 
 class Player:
@@ -12,7 +14,6 @@ class Player:
         self.x, self.y = PLAYER_POSITION
         self.angle = PLAYER_ANGLE
         self.speed = PLAYER_SPEED
-        self.rotation_speed = PLAYER_ROTATION_SPEED
 
     @property
     def position(self):
@@ -22,7 +23,17 @@ class Player:
     def map_position(self):
         return int(self.x), int(self.y)
 
-    def movement_input(self):
+    def mouse_input(self):
+        mouse_x = pygame.mouse.get_pos()[0]
+        if mouse_x < MOUSE_BORDER_LEFT or mouse_x > MOUSE_BORDER_RIGHT:
+            pygame.mouse.set_pos([WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2])
+        self.relative_movement = pygame.mouse.get_rel()[0]
+        self.relative_movement = max(-MOUSE_MAX_RELATIVE_MOVEMENT,
+                                     min(MOUSE_MAX_RELATIVE_MOVEMENT, self.relative_movement))
+        self.angle += self.relative_movement * MOUSE_SENSITIVITY * self.game.delta_time
+        self.angle %= tau
+
+    def keyboard_input(self):
         sin_a = sin(self.angle)
         cos_a = cos(self.angle)
         dx, dy = 0, 0
@@ -43,16 +54,12 @@ class Player:
             dx -= speed_sin
             dy += speed_cos
         self.move(dx, dy)
-        if keys[pygame.K_LEFT]:
-            self.angle -= self.rotation_speed * self.game.delta_time
-        elif keys[pygame.K_RIGHT]:
-            self.angle += self.rotation_speed * self.game.delta_time
-        self.angle %= tau
 
     def move(self, dx, dy):
-        if self.game.map.is_empty(self.x + dx, self.y):
+        scale = PLAYER_SIZE_SCALE / self.game.delta_time
+        if self.game.map.is_empty(self.x + dx * scale, self.y):
             self.x += dx
-        if self.game.map.is_empty(self.x, self.y + dy):
+        if self.game.map.is_empty(self.x, self.y + dy * scale):
             self.y += dy
 
     def draw(self):
@@ -60,4 +67,5 @@ class Player:
                            (self.x * 100, self.y * 100), 15)
 
     def update(self):
-        self.movement_input()
+        self.mouse_input()
+        self.keyboard_input()
