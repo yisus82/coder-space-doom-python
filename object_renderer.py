@@ -29,7 +29,9 @@ class ObjectRenderer:
         }
 
     def render_game_objects(self):
-        for _, image, pos in self.game.ray_casting.objects_to_render:
+        objects_to_render = sorted(
+            self.game.ray_casting.objects_to_render, key=lambda o: o[0], reverse=True)
+        for _, image, pos in objects_to_render:
             self.game.screen.blit(image, pos)
 
     def draw_background(self):

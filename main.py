@@ -3,6 +3,7 @@ import sys
 import pygame
 
 from map import Map
+from object_handler import ObjectHandler
 from object_renderer import ObjectRenderer
 from player import Player
 from ray_casting import RayCasting
@@ -23,6 +24,7 @@ class Game:
         self.player = Player(self)
         self.object_renderer = ObjectRenderer(self)
         self.ray_casting = RayCasting(self)
+        self.object_handler = ObjectHandler(self)
 
     def check_events(self):
         for event in pygame.event.get():
@@ -33,6 +35,7 @@ class Game:
     def update(self):
         self.player.update()
         self.ray_casting.update()
+        self.object_handler.update()
         pygame.display.flip()
         self.delta_time = self.clock.tick(FPS)
         pygame.display.set_caption(f"{TITLE} - {self.clock.get_fps():.2f} FPS")
