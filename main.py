@@ -31,6 +31,7 @@ class Game:
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
+            self.player.handle_event(event)
 
     def update(self):
         self.player.update()
@@ -42,6 +43,7 @@ class Game:
 
     def draw(self):
         self.object_renderer.draw()
+        self.player.draw()
 
     def run(self):
         while True:

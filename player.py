@@ -6,6 +6,7 @@ from settings import (MOUSE_BORDER_LEFT, MOUSE_BORDER_RIGHT,
                       MOUSE_MAX_RELATIVE_MOVEMENT, MOUSE_SENSITIVITY,
                       PLAYER_ANGLE, PLAYER_POSITION, PLAYER_SIZE_SCALE,
                       PLAYER_SPEED, WINDOW_HEIGHT, WINDOW_WIDTH)
+from weapon import Weapon
 
 
 class Player:
@@ -14,6 +15,7 @@ class Player:
         self.x, self.y = PLAYER_POSITION
         self.angle = PLAYER_ANGLE
         self.speed = PLAYER_SPEED
+        self.weapon = Weapon(self, 'shotgun', self.game, 0.4, 0.25, 50)
 
     @property
     def position(self):
@@ -22,6 +24,11 @@ class Player:
     @property
     def map_position(self):
         return int(self.x), int(self.y)
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                self.weapon.fire()
 
     def mouse_input(self):
         mouse_x = pygame.mouse.get_pos()[0]
@@ -63,9 +70,9 @@ class Player:
             self.y += dy
 
     def draw(self):
-        pygame.draw.circle(self.game.screen, 'green',
-                           (self.x * 100, self.y * 100), 15)
+        self.weapon.draw()
 
     def update(self):
         self.mouse_input()
         self.keyboard_input()
+        self.weapon.update()

@@ -1,3 +1,6 @@
+
+from os.path import join
+
 from sprite_object import AnimatedSprite, SpriteObject
 
 
@@ -5,8 +8,8 @@ class ObjectHandler:
     def __init__(self, game):
         self.game = game
         self.sprite_list = []
-        self.static_sprite_path = 'resources/sprites/static_sprites/'
-        self.animated_sprite_path = 'resources/sprites/animated_sprites/'
+        self.static_sprite_folder = 'resources/sprites/static_sprites/'
+        self.animated_sprite_folder = 'resources/sprites/animated_sprites/'
 
         # sprites
         self.add_sprite('candelabra', 'static', (10.5, 3.5))
@@ -39,10 +42,10 @@ class ObjectHandler:
 
     def add_sprite(self, sprite_name, sprite_type, position):
         if sprite_type == 'static':
-            sprite_path = self.static_sprite_path + sprite_name
+            sprite_path = join(self.static_sprite_folder, sprite_name)
             sprite = SpriteObject(self.game, sprite_path, position)
         elif sprite_type == 'animated':
-            sprite_path = self.animated_sprite_path + sprite_name
+            sprite_path = join(self.animated_sprite_folder, sprite_name)
             sprite = AnimatedSprite(self.game, sprite_path, position)
         else:
             return
