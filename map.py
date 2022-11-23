@@ -40,6 +40,8 @@ class Map:
     def __init__(self, game):
         self.game = game
         self.mini_map = mini_map
+        self.rows = len(self.mini_map)
+        self.cols = len(self.mini_map[0])
         self.obstacles = {(y, x): self.mini_map[x][y] for x in range(len(self.mini_map))
                           for y in range(len(self.mini_map[0])) if self.mini_map[x][y] != 0}
 

@@ -4,8 +4,9 @@ import pygame
 
 from settings import (MOUSE_BORDER_LEFT, MOUSE_BORDER_RIGHT,
                       MOUSE_MAX_RELATIVE_MOVEMENT, MOUSE_SENSITIVITY,
-                      PLAYER_ANGLE, PLAYER_POSITION, PLAYER_SIZE_SCALE,
-                      PLAYER_SPEED, WINDOW_HEIGHT, WINDOW_WIDTH)
+                      PLAYER_ANGLE, PLAYER_MAX_HEALTH, PLAYER_POSITION,
+                      PLAYER_SIZE_SCALE, PLAYER_SPEED, WINDOW_HEIGHT,
+                      WINDOW_WIDTH)
 from weapon import Weapon
 
 
@@ -15,7 +16,13 @@ class Player:
         self.x, self.y = PLAYER_POSITION
         self.angle = PLAYER_ANGLE
         self.speed = PLAYER_SPEED
+        self.health = PLAYER_MAX_HEALTH
         self.weapon = Weapon(self, 'shotgun', self.game, 0.4, 0.25, 50)
+        self.invulnerable = False
+        self.invulnerability_time = 0
+        self.invulnerability_cooldown = 1500
+        self.pain_sound = pygame.mixer.Sound(
+            'resources/sounds/player/pain.wav')
 
     @property
     def position(self):
@@ -69,10 +76,28 @@ class Player:
         if self.game.map.is_empty(self.x, self.y + dy * scale):
             self.y += dy
 
+    def check_game_over(self):
+        if self.health <= 0:
+            self.game.game_over()
+
+    def take_damage(self, amount):
+        if not self.invulnerable and self.health > 0:
+            self.invulnerable = True
+            self.invulnerability_time = pygame.time.get_ticks()
+            self.health -= amount
+            self.pain_sound.play()
+            self.check_game_over()
+
+    def cooldowns(self):
+        current_time = pygame.time.get_ticks()
+        if self.invulnerable and current_time - self.invulnerability_time >= self.invulnerability_cooldown:
+            self.invulnerable = False
+
     def draw(self):
         self.weapon.draw()
 
     def update(self):
+        self.cooldowns()
         self.mouse_input()
         self.keyboard_input()
         self.weapon.update()

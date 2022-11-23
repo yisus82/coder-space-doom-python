@@ -41,6 +41,3 @@ class Weapon(AnimatedSprite):
 
     def draw(self):
         self.game.screen.blit(self.image, self.weapon_pos)
-
-    def update(self):
-        self.animate()

@@ -5,6 +5,7 @@ import pygame
 from map import Map
 from object_handler import ObjectHandler
 from object_renderer import ObjectRenderer
+from path_finder import PathFinder
 from player import Player
 from ray_casting import RayCasting
 from settings import FPS, TITLE, WINDOW_HEIGHT, WINDOW_WIDTH
@@ -17,6 +18,7 @@ class Game:
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
         self.delta_time = 1
+        self.is_game_over = False
         self.new_game()
 
     def new_game(self):
@@ -25,6 +27,7 @@ class Game:
         self.object_renderer = ObjectRenderer(self)
         self.ray_casting = RayCasting(self)
         self.object_handler = ObjectHandler(self)
+        self.path_finder = PathFinder(self)
 
     def check_events(self):
         for event in pygame.event.get():
@@ -33,13 +36,18 @@ class Game:
                 sys.exit()
             self.player.handle_event(event)
 
+    def game_over(self):
+        self.is_game_over = True
+
     def update(self):
-        self.player.update()
-        self.ray_casting.update()
-        self.object_handler.update()
-        pygame.display.flip()
-        self.delta_time = self.clock.tick(FPS)
-        pygame.display.set_caption(f"{TITLE} - {self.clock.get_fps():.2f} FPS")
+        if not self.is_game_over:
+            self.player.update()
+            self.ray_casting.update()
+            self.object_handler.update()
+            pygame.display.flip()
+            self.delta_time = self.clock.tick(FPS)
+            pygame.display.set_caption(
+                f"{TITLE} - {self.clock.get_fps():.2f} FPS")
 
     def draw(self):
         self.object_renderer.draw()

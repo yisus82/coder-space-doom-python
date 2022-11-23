@@ -15,6 +15,8 @@ class SpriteObject:
         self.x, self.y = position
         self.sprite_scale = sprite_scale
         self.height_shift = height_shift
+        self.dx, self.dy, self.theta, self.screen_x, self.dist, self.norm_dist = 0, 0, 0, 0, 1, 1
+        self.sprite_half_width = 0
         self.field_of_vision = pi / 3
         self.num_rays = WINDOW_WIDTH // 2
         self.delta_angle = self.field_of_vision / self.num_rays
@@ -33,35 +35,36 @@ class SpriteObject:
                     image_surfaces.append(image_surface)
                 except pygame.error:
                     pass
+            break
         return image_surfaces
 
-    def get_sprite_projection(self, screen_x, normalized_distance):
-        projection = self.screen_distance / normalized_distance * self.sprite_scale
+    def get_sprite_projection(self):
+        projection = self.screen_distance / self.norm_dist * self.sprite_scale
         image_ratio = self.image.get_width() / self.image.get_height()
         projection_width, projection_height = projection * image_ratio, projection
         image = pygame.transform.scale(
             self.image, (projection_width, projection_height))
+        self.sprite_half_width = projection_width // 2
         height_shift = projection_height * self.height_shift
-        position = screen_x - projection_width // 2, WINDOW_HEIGHT // 2 - \
+        position = self.screen_x - self.sprite_half_width, WINDOW_HEIGHT // 2 - \
             projection_height // 2 + height_shift
         return (image, position)
 
     def render_sprite(self):
-        dx = self.x - self.game.player.x
-        dy = self.y - self.game.player.y
-        theta = atan2(dy, dx)
-        delta = theta - self.game.player.angle
-        if (dx > 0 and self.game.player.angle > pi) or (dx < 0 and dy < 0):
+        self.dx = self.x - self.game.player.x
+        self.dy = self.y - self.game.player.y
+        self.theta = atan2(self.dy, self.dx)
+        delta = self.theta - self.game.player.angle
+        if (self.dx > 0 and self.game.player.angle > pi) or (self.dx < 0 and self.dy < 0):
             delta += tau
         delta_rays = delta / self.delta_angle
-        screen_x = (self.num_rays // 2 + delta_rays) * self.scale
-        distance = hypot(dx, dy)
-        normalized_distance = distance * cos(delta)
-        if -self.image.get_width() // 2 < screen_x < (WINDOW_WIDTH + self.image.get_width() // 2) and normalized_distance > 0.5:
-            image, position = self.get_sprite_projection(
-                screen_x, normalized_distance)
+        self.screen_x = (self.num_rays // 2 + delta_rays) * self.scale
+        self.dist = hypot(self.dx, self.dy)
+        self.norm_dist = self.dist * cos(delta)
+        if -self.image.get_width() // 2 < self.screen_x < (WINDOW_WIDTH + self.image.get_width() // 2) and self.norm_dist > 0.5:
+            image, position = self.get_sprite_projection()
             self.game.ray_casting.objects_to_render.append(
-                (normalized_distance, image, position))
+                (self.norm_dist, image, position))
 
     def update(self):
         self.render_sprite()
