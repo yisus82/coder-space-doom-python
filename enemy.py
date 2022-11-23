@@ -177,7 +177,7 @@ class NPC(AnimatedSprite):
             self.cooldowns()
             if self.status != 'death':
                 self.check_hit()
-                if self.status != 'pain':
+                if self.status != 'pain' and self.status != 'death':
                     if self.dist <= self.attack_dist:
                         self.update_status('attack')
                         self.attack()

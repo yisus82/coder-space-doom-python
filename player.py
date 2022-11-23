@@ -18,9 +18,13 @@ class Player:
         self.speed = PLAYER_SPEED
         self.health = PLAYER_MAX_HEALTH
         self.weapon = Weapon(self, 'shotgun', self.game, 0.4, 0.25, 50)
+        self.relative_movement = 0
         self.invulnerable = False
         self.invulnerability_time = 0
-        self.invulnerability_cooldown = 1500
+        self.invulnerability_cooldown = 500
+        self.recovering_health = False
+        self.recovering_health_time = 0
+        self.recovering_health_cooldown = 700
         self.pain_sound = pygame.mixer.Sound(
             'resources/sounds/player/pain.wav')
 
@@ -78,6 +82,8 @@ class Player:
 
     def check_game_over(self):
         if self.health <= 0:
+            self.health = 0
+            self.relative_movement = 0
             self.game.game_over()
 
     def take_damage(self, amount):
@@ -85,13 +91,22 @@ class Player:
             self.invulnerable = True
             self.invulnerability_time = pygame.time.get_ticks()
             self.health -= amount
+            self.game.object_renderer.draw_player_damage()
             self.pain_sound.play()
             self.check_game_over()
+
+    def recover_health(self):
+        if not self.recovering_health and self.health < PLAYER_MAX_HEALTH:
+            self.recovering_health = True
+            self.recovering_health_time = pygame.time.get_ticks()
+            self.health += 1
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
         if self.invulnerable and current_time - self.invulnerability_time >= self.invulnerability_cooldown:
             self.invulnerable = False
+        if self.recovering_health and current_time - self.recovering_health_time >= self.recovering_health_cooldown:
+            self.recovering_health = False
 
     def draw(self):
         self.weapon.draw()
@@ -101,3 +116,4 @@ class Player:
         self.mouse_input()
         self.keyboard_input()
         self.weapon.update()
+        self.recover_health()

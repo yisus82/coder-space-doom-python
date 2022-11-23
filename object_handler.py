@@ -79,6 +79,10 @@ class ObjectHandler:
             self.add_enemy(enemy_type, (x + 0.5, y + 0.5))
             self.enemy_positions.append(position)
 
+    def check_win(self):
+        if not len(self.enemy_positions):
+            self.game.win_game()
+
     def update(self):
         for sprite in self.sprite_list:
             sprite.update()
@@ -86,3 +90,4 @@ class ObjectHandler:
             enemy.update()
         self.enemy_positions = [
             enemy.map_position for enemy in self.enemy_list if enemy.alive]
+        self.check_win()
